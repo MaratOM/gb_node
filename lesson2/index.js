@@ -1,26 +1,31 @@
 const rl = require('readline-sync');
 const cards = require('cards');
 
-const Player = require('./Player');
-const Players = require('./Players');
-const cardsHelpers = require('./cardsHelpers')
+const Player = require('./models/Player');
+const Game = require('./models/Game');
+const cardsHelpers = require('./helpers/cardsHelpers')
+const views = require('./views')
 
-const deck = new cards.PokerDeck();
-deck.shuffleAll();
+
+const deck = new cards.PokerDeck()
+deck.shuffleAll()
 const cardSuitImage = suit => cards.Card.suitUnicodeStrings[suit]
 
-var pls = new Players();
+const players = []
+const games = []
+let game = new Game()
+games.push(game)
 
 const isAnswerYes = answer => answer === 'y' || answer === 'Y'
 const isAnswerNo = answer => answer === 'n' || answer === 'N'
 
-
 const greetingQuestion = () => {
-  let answer = rl.question('Представьтесь, пожалуйста ')
+  let answer = rl.question('Добро пожаловать в наш клуб!\nПредставьтесь, пожалуйста ')
   if(answer) {
-    console.log(`Рады Вас приветствовать, ${answer}`);
+    views.greeting(answer)
 
-    pls.addPlayer(new Player(answer))
+    players.push(answer)
+    game.addPlayer(new Player(answer))
     addAnotherPlayerQuestion()
   }
   else {
@@ -29,12 +34,13 @@ const greetingQuestion = () => {
 }
 
 const addAnotherPlayerQuestion = () => {
-  let answer = rl.question('Будут еще игроки? (y/n) /**Игра может вестисть один на один с крупье**/ ')
+  let answer = rl.question('Будут ли еще игроки? (y/n) /**Игра может вестисть один на один с крупье**/ ')
   if(isAnswerYes(answer)) {
     greetingQuestion()
   }
   else if(isAnswerNo(answer)) {
-    pls.addPlayer(new Player('Крупье'))
+    players.push('Крупье')
+    game.addPlayer(new Player('Крупье'))
     startGameQuestion()
   }
   else {
@@ -43,23 +49,19 @@ const addAnotherPlayerQuestion = () => {
 }
 
 const startGameQuestion = () => {
-  let answer = rl.question('Начать игру (y)/ Выйти (n) ')
+  const currentPlayer = game.players[game.currentPlayerIndex]
+  let answer = rl.question('Начать игру [игрок ' + currentPlayer.name + '] (y)/ Выйти (n) ')
+
   if(isAnswerYes(answer)) {
-    const card = deck.draw();
-    pls.players[pls.currentPlayerIndex].turns.push({
-      value: card.value,
-      suit: cardSuitImage(card.suit),
-      bjValue: cardsHelpers.getCardBJValue(card.value)
-    })
-    pls.players[pls.currentPlayerIndex].total += parseInt(cardsHelpers.getCardBJValue(card.value), 10)
-    console.log('Ваша карта ' + pls.players[pls.currentPlayerIndex].showCards())
+    const card = getCard(currentPlayer)
+    views.yourCard(card)
     nextTurnQuestion()
   }
  else if(answer === 'n' || answer === 'N') {
-    console.log('Спасибо за игру! Приходите еще!')
+    views.bye()
     process.exit(0)
   }
-  else if(answer !== 'y' && answer !== 'Y' && answer !== 'n' && answer !== 'N') {
+  else if(!isAnswerYes(answer) && !isAnswerNo(answer)) {
     startGameQuestion()
   }
   else {
@@ -69,40 +71,97 @@ const startGameQuestion = () => {
 
 const nextTurnQuestion = () => {
   let answer = rl.question('Еще одну? (y/n) ')
-  if(answer === 'y' || answer === 'Y'
-      && pls.players[pls.currentPlayerIndex].total <= 21) {
-    const card = deck.draw();
-    pls.players[pls.currentPlayerIndex].turns.push({
-      value: card.value,
-      suit: cardSuitImage(card.suit),
-      bjValue: cardsHelpers.getCardBJValue(card.value)
-    })
-    pls.players[pls.currentPlayerIndex].total += parseInt(cardsHelpers.getCardBJValue(card.value), 10)
+  const currentPlayer = game.players[game.currentPlayerIndex]
 
-    console.log('Ваши карты ' + pls.players[pls.currentPlayerIndex].showCards())
-    console.log('Всего очков ' + pls.players[pls.currentPlayerIndex].total)
+  if(isAnswerYes(answer) && currentPlayer.total <= 21) {
+    const card = getCard(currentPlayer)
 
-    nextTurnQuestion()
-  }
-  else if(answer === 'n' || answer === 'N'
-            && pls.players[pls.currentPlayerIndex].total > 21) {
-    console.log('Игрок ' + pls.players[pls.currentPlayerIndex].name + ' закончил игру с картами ' + pls.players[pls.currentPlayerIndex].showCards())
+    views.yourCard(card)
+    views.playersCards(game)
 
-    pls.currentPlayerIndex++
-
-    if(pls.players.length > pls.currentPlayerIndex) {
-      console.log('Следующий игрок - ' + pls.players[pls.currentPlayerIndex].name)
+    if(currentPlayer.total > 21) {
+      changePlayer()
+      startGameQuestion()
     }
     else {
-      console.log('Игра окончена')
-      pls.players.forEach(player => console.log(player.name + ' '  + player.showCards()))
+      nextTurnQuestion()
     }
-
+  }
+  else if(isAnswerNo(answer) || currentPlayer.total > 21) {
+    changePlayer()
     startGameQuestion()
   }
   else {
     nextTurnQuestion()
   }
+}
+
+const changePlayer = () => {
+  let currentPlayer = game.players[game.currentPlayerIndex]
+
+  if(currentPlayer.total > 21) {
+    views.overdraw(currentPlayer)
+  }
+
+  views.playerGameOver(currentPlayer)
+
+  game.currentPlayerIndex++
+  currentPlayer = game.players[game.currentPlayerIndex]
+  if(game.players.length > game.currentPlayerIndex) {
+    views.nextPlayer(currentPlayer)
+  }
+  else {
+    gameOver()
+  }
+}
+
+const gameOver = () => {
+  views.gameOver()
+  views.playersCards(game)
+  views.winner(calculateWinner())
+  views.gamesStat(games, players)
+
+  game = new Game()
+  players.forEach(player => game.addPlayer(new Player(player)))
+  games.push(game)
+  deck.shuffleAll()
+}
+
+const getCard = (currentPlayer) => {
+  const card = deck.draw()
+  currentPlayer.turns.push({
+    value: card.value,
+    suit: cardSuitImage(card.suit),
+    bjValue: cardsHelpers.getCardBJValue(card.value)
+  })
+  currentPlayer.total += parseInt(cardsHelpers.getCardBJValue(card.value), 10)
+
+  return {value: card.value, suit: cardSuitImage(card.suit)}
+}
+
+const calculateWinner = () => {
+  let winnerValue = 0, winnerIndexes = []
+  game.players.forEach((player, index) => {
+    if(player.total > 21)
+      return
+
+    if(player.total > winnerValue || player.total === winnerValue) {
+      if(player.total > winnerValue) {
+        winnerIndexes = [index]
+      }
+      if(player.total === winnerValue) {
+        winnerIndexes.push(index)
+      }
+      winnerValue = player.total
+    }
+  })
+
+  winnerIndexes.forEach(index => {
+    game.players[index].winner = true
+    game.winners.push(game.players[index].name)
+  })
+
+  return game.winners.toString()
 }
 
 greetingQuestion()

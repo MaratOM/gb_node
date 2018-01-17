@@ -1,7 +1,8 @@
-class Players {
+class Game {
   constructor() {
     this.players = []
-    this.currentPlayer = null
+    this.currentPlayerIndex = null
+    this.winners = []
   }
 
   addPlayer(player) {
@@ -12,4 +13,4 @@ class Players {
   }
 }
 
-module.exports = Players
+module.exports = Game

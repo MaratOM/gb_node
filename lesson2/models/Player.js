@@ -12,13 +12,6 @@ class Player {
 
     return cards
   }
-
-  // getCurrentTotal() {
-  //   let total = 0
-  //   this.turns.forEach(card => cards += card.value + card.suit + ' ')
-  //
-  //   return cards
-  // }
 }
 
 module.exports = Player

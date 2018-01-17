@@ -1,7 +1,12 @@
 module.exports = {
   getCardBJValue: value => {
     if(isNaN(value)) {
-      value = 10
+      if(value === 'A') {
+        value = 11
+      }
+      else {
+        value = 10
+      }
     }
 
     return value
