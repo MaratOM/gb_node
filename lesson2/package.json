@@ -1,0 +1,15 @@
+{
+  "name": "gb_node",
+  "version": "1.0.0",
+  "description": "GB NodeJS course homeworks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "MaratOM",
+  "license": "ISC",
+  "dependencies": {
+    "cards": "^0.1.1",
+    "readline-sync": "^1.4.7"
+  }
+}
