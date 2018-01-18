@@ -1,7 +1,6 @@
 class Player {
   constructor(name) {
     this.name = name
-    this.games = []
     this.turns = []
     this.total = 0
   }

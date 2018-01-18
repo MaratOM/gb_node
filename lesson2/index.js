@@ -6,7 +6,6 @@ const Game = require('./models/Game');
 const cardsHelpers = require('./helpers/cardsHelpers')
 const views = require('./views')
 
-
 const deck = new cards.PokerDeck()
 deck.shuffleAll()
 const cardSuitImage = suit => cards.Card.suitUnicodeStrings[suit]
@@ -20,7 +19,7 @@ const isAnswerYes = answer => answer === 'y' || answer === 'Y'
 const isAnswerNo = answer => answer === 'n' || answer === 'N'
 
 const greetingQuestion = () => {
-  let answer = rl.question('Добро пожаловать в наш клуб!\nПредставьтесь, пожалуйста ')
+  const answer = rl.question('Добро пожаловать в Black Jack клуб!\nПредставьтесь, пожалуйста ')
   if(answer) {
     views.greeting(answer)
 
@@ -34,7 +33,7 @@ const greetingQuestion = () => {
 }
 
 const addAnotherPlayerQuestion = () => {
-  let answer = rl.question('Будут ли еще игроки? (y/n) /**Игра может вестисть один на один с крупье**/ ')
+  const answer = rl.question('Будут ли еще игроки? (y/n) /**Игра может вестисть один на один с крупье**/ ')
   if(isAnswerYes(answer)) {
     greetingQuestion()
   }
@@ -50,44 +49,39 @@ const addAnotherPlayerQuestion = () => {
 
 const startGameQuestion = () => {
   const currentPlayer = game.players[game.currentPlayerIndex]
-  let answer = rl.question('Начать игру [игрок ' + currentPlayer.name + '] (y)/ Выйти (n) ')
+  const answer = rl.question('Начать игру [игрок ' + currentPlayer.name + '] (y)/ Выйти (n) ')
 
   if(isAnswerYes(answer)) {
-    const card = getCard(currentPlayer)
+    const card = getCard()
     views.yourCard(card)
     nextTurnQuestion()
   }
- else if(answer === 'n' || answer === 'N') {
+ else if(isAnswerNo(answer)) {
     views.bye()
     process.exit(0)
   }
-  else if(!isAnswerYes(answer) && !isAnswerNo(answer)) {
-    startGameQuestion()
-  }
   else {
-    nextTurnQuestion()
+    startGameQuestion()
   }
 }
 
 const nextTurnQuestion = () => {
-  let answer = rl.question('Еще одну? (y/n) ')
   const currentPlayer = game.players[game.currentPlayerIndex]
+  const answer = rl.question('Еще одну? (y/n) ')
 
   if(isAnswerYes(answer) && currentPlayer.total <= 21) {
-    const card = getCard(currentPlayer)
+    const card = getCard()
 
     views.yourCard(card)
     views.playersCards(game)
 
-    if(currentPlayer.total > 21) {
-      changePlayer()
-      startGameQuestion()
-    }
-    else {
-      nextTurnQuestion()
-    }
+    nextTurnQuestion()
   }
   else if(isAnswerNo(answer) || currentPlayer.total > 21) {
+    if(currentPlayer.total > 21) {
+      views.overdraw(currentPlayer)
+    }
+
     changePlayer()
     startGameQuestion()
   }
@@ -98,10 +92,6 @@ const nextTurnQuestion = () => {
 
 const changePlayer = () => {
   let currentPlayer = game.players[game.currentPlayerIndex]
-
-  if(currentPlayer.total > 21) {
-    views.overdraw(currentPlayer)
-  }
 
   views.playerGameOver(currentPlayer)
 
@@ -127,7 +117,8 @@ const gameOver = () => {
   deck.shuffleAll()
 }
 
-const getCard = (currentPlayer) => {
+const getCard = () => {
+  const currentPlayer = game.players[game.currentPlayerIndex]
   const card = deck.draw()
   currentPlayer.turns.push({
     value: card.value,
