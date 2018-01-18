@@ -27,7 +27,7 @@ module.exports = {
   winner: winner => term.red.bold(`*** Победитель - игрок ${winner}! ***\n`),
 
   gamesStat: (games, players) => {
-    let playersScores = players.reduce((Obj, playerName) => {
+    const playersScores = players.reduce((Obj, playerName) => {
       Obj[playerName] = 0
       return Obj
     }, {})
