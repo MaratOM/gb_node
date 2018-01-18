@@ -6,10 +6,7 @@ class Player {
   }
 
   showCards() {
-    let cards = ''
-    this.turns.forEach(card => cards += card.value + card.suit + ' ')
-
-    return cards
+    return this.turns.reduce((prevCard, curCard) => prevCard + ' ' + curCard.value + curCard.suit + ' ', '')
   }
 }
 

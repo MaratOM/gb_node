@@ -33,6 +33,6 @@ Use Node Package Manager:
 ← удобный цветной интерфейс
 
 
-##♣♥♠♦ Have Fun! ♣♥♠♦
+♣♥♠♦ Have Fun! ♣♥♠♦
 
 #### License: MIT

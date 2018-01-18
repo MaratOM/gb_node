@@ -27,10 +27,10 @@ module.exports = {
   winner: winner => term.red.bold(`*** Победитель - игрок ${winner}! ***\n`),
 
   gamesStat: (games, players) => {
-    let playersScores = {}
-    players.forEach(playerName => {
-      playersScores[playerName] = 0
-    })
+    let playersScores = players.reduce((Obj, playerName) => {
+      Obj[playerName] = 0
+      return Obj
+    }, {})
 
     games.forEach(game => {
       if(game.winners.length) {
