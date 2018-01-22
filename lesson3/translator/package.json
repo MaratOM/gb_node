@@ -1,0 +1,17 @@
+{
+  "name": "gb_node",
+  "version": "1.0.0",
+  "description": "GB NodeJS course homeworks",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "MaratOM",
+  "license": "ISC",
+  "dependencies": {
+    "readline": "^1.3.0",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "terminal-kit": "^1.14.3"
+  }
+}
