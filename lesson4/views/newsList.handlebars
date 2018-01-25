@@ -1,0 +1,10 @@
+<div class="header container"><h1><a href="/">News Aggregator App</a></h1></div>
+<div class="container">
+  <h2>News Service "{{service}}" news list</h2>
+  <hr/>
+  <div class="body">
+    {{#each news}}
+        <div class="row"><a href="/news/{{../service}}/?q={{urn}}">{{title}}</a></div>
+    {{/each}}
+  </div>
+</div>
