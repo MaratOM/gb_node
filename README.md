@@ -9,7 +9,7 @@
 
 # Lesson2
 
-##Консольная игра Black Jack
+## Консольная игра Black Jack
 
 ## start
 
@@ -39,7 +39,7 @@ Use Node Package Manager:
 
 # Lesson3
 
-##Новостной сервер
+## Новостной сервер
 
 ## start
 
@@ -60,7 +60,7 @@ Use Node Package Manager:
 
 #### License: MIT
 
-##Консольное приложение Переводчик
+## Консольное приложение Переводчик
 
 ## start
 
@@ -76,5 +76,26 @@ Use Node Package Manager:
 ← пользователь вводит слово на английском и получает его перевод
 
 ← удобный цветной интерфейс
+
+#### License: MIT
+
+# Lesson4
+
+## News Aggregator App
+
+## start
+
+Use Node Package Manager:
+
+    npm start
+
+
+## Key features
+
+← news aggregating from number of news services  
+
+← full news item is shown directly in the app (no redirecting to news service)
+
+← easy to add new news services
 
 #### License: MIT
