@@ -99,3 +99,26 @@ Use Node Package Manager:
 ← easy to add new news services
 
 #### License: MIT
+
+# Lesson5
+
+## Todo List App
+
+## start
+
+Use Node Package Manager:
+
+    npm start
+
+
+## Key features
+
+← REST API  for 
+
+- List all todos
+- Add todo item
+- Update todo data
+- Toggle todo completed flag
+- Delete todo
+
+#### License: MIT
