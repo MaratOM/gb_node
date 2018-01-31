@@ -113,12 +113,17 @@ Use Node Package Manager:
 
 ## Key features
 
-← REST API  for 
+← REST API  for
 
 - List all todos
 - Add todo item
 - Update todo data
 - Toggle todo completed flag
 - Delete todo
+
+← User authorization via passport.js
+
+- Using Local Strategy
+- Using Facebook Strategy
 
 #### License: MIT

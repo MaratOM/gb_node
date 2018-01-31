@@ -14,29 +14,22 @@ const todoSchema = new Schema({
   },
 })
 
-todoSchema.statics.getAllTodos = async function() {
+todoSchema.statics.addTodo = async function(todoData) {
   try {
-    return await Todo.find()
-  } catch(error) {
-    throw new Error(error)
-  }
-}
-
-todoSchema.methods.addTodo = async function(todo) {
-  try {
-    await this.set(todo).save()
+    const todo = new Todo(todoData)
+    await todo.save()
     return 'Todo item added!'
   } catch(error) {
     throw new Error(error)
   }
 }
 
-todoSchema.methods.updateTodo = async function(id, todoNewData) {
+todoSchema.statics.updateTodo = async function(id, todoNewData) {
   try {
-    const todo = await this.model('todo').findById(id)
+    const todo = await this.findById(id)
 
     if(todo) {
-      await todo.set(todoNewData).save()
+      await todo.update(todoNewData)
       return `Todo updated!`
     }
     else {
@@ -47,12 +40,12 @@ todoSchema.methods.updateTodo = async function(id, todoNewData) {
   }
 }
 
-todoSchema.methods.todoToggleCompleted = async function(id) {
+todoSchema.statics.todoToggleCompleted = async function(id) {
   try {
-    const todo = await this.model('todo').findById(id)
+    const todo = await Todo.findById(id)
 
     if(todo) {
-      await todo.set({completed: !todo.completed}).save()
+      await todo.update({completed: !todo.completed})
       return `Todo completed set to ${todo.completed}`
     }
     else {
@@ -63,22 +56,24 @@ todoSchema.methods.todoToggleCompleted = async function(id) {
   }
 }
 
-todoSchema.methods.deleteTodo = async function(id) {
+todoSchema.statics.deleteTodo = async function(id) {
   try {
-    const todo = await this.model('todo').findById(id)
+    let message = ''
+    const result = await this.remove({_id: id})
 
-    if(todo) {
-      await this.model('todo').remove(todo)
-      return 'Todo deleted!'
+    if(result.ok === 1 && result.n === 1) {
+       message = 'Todo deleted!'
     }
     else {
-      return 'No such todo!'
+      message = 'No such todo!'
     }
+
+    return message
   } catch(error) {
     throw new Error(error)
   }
 }
 
-const Todo = mongoose.model('todo', todoSchema)
+const Todo = mongoose.model('Todo', todoSchema)
 
 module.exports = Todo
