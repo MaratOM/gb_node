@@ -1,65 +1,34 @@
 const express = require('express')
+const path = require('path')
 const bodyParser = require('body-parser')
+const exphbs = require('express-handlebars')
+const session = require('express-session')
+const passport = require('passport')
+
+const usersRoutes = require('./routes/users')
+const todosRoutes = require('./routes/todos')
+
 const app = express()
 
-const Todo = require('./models/todo')
+app.set('views', path.join(__dirname + '/views'))
+app.engine('handlebars', exphbs({defaultLayout: 'main'}))
+app.set('view engine', 'handlebars')
+app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(session({
+  secret: 'todos',
+  resave: true,
+  saveUninitialized: true
+}))
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 const port = 8000
 app.listen(port, () => {
   console.log('Listening on port ' + port)
 })
 
-app.get('/',  async (req, res) => {
-  res.redirect('/todos')
-})
-
-app.get('/todos',  async (req, res) => {
-  const todos = await Todo.find()
-  res.send(todos)
-})
-
-app.post('/todos',  async (req, res) => {
-  try {
-    const message = await new Todo().addTodo(req.body)
-    res.send(message)
-  }
-  catch(err) {
-    console.log(err)
-    res.send('Something went wrong!')
-  }
-})
-
-app.put('/todos/:id',  async (req, res) => {
-  try {
-    const message = await new Todo().updateTodo(req.params.id, req.body)
-    res.send(message)
-  }
-  catch(err) {
-    console.log(err)
-    res.send('Something went wrong!')
-  }
-})
-
-app.patch('/todos/:id/complete',  async (req, res) => {
-  try {
-    const message = await new Todo().todoToggleCompleted(req.params.id)
-    res.send(message)
-  }
-  catch(err) {
-    console.log(err)
-    res.send('Something went wrong!')
-  }
-})
-
-app.delete('/todos/:id',  async (req, res) => {
-  try {
-    const message = await new Todo().deleteTodo(req.params.id)
-    res.send(message)
-  }
-  catch(err) {
-    console.log(err)
-    res.send('Something went wrong!')
-  }
-})
+app.use('/todos', todosRoutes)
+app.use('/', usersRoutes)
